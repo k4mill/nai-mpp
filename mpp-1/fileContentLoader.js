@@ -35,6 +35,11 @@ class FileContentLoader {
     }
 
     addAttribute(attr) {
+        if(attr.length > this.attributes[0].length) return;
+        if(attr.length < this.attributes[0].length) {
+            for(let i = attr.length - 1; i < this.attributes[0].length - 1; i++)
+                attr.splice(i, 0, 0);
+        }
         this.attributes.push(attr);
     }
 }

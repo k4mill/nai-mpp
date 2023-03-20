@@ -34,7 +34,7 @@ function findMode(array) {
             maxCountKey = key;
         } 
     })
-
+    
     return maxCountKey;
 }
 
@@ -43,6 +43,11 @@ function calculateDistances(trainingFcl, testFcl, k) {
     correctGuessNumber = 0;
     if(!trainingFcl || !testFcl) return;
     if(trainingFcl?.attributes.length < 1 || testFcl?.attributes.length < 1) return;
+    if(trainingFcl?.attributes[0].length < testFcl?.attributes[0].length) {
+        const resultsWrapper = document.querySelector(".results-wrapper");
+        resultsWrapper.innerText = 'Niepoprawne dane!';
+        return;
+    }
 
     document.querySelector('#custom-vector-wrapper').style.display = 'block';
 
@@ -153,7 +158,6 @@ document.addEventListener('DOMContentLoaded', () => {
         if(!testFcl || !trainingFcl) return;
 
         const input = document.querySelector("#custom-vector");
-        console.log(...input.value.split(';'))
         testFcl.addAttribute([...input.value.split(';'), '?']);
         calculateDistances(trainingFcl, testFcl, k);
     })
