@@ -7,6 +7,11 @@ let guessResults = [];
 function calculateDistance(testCase, trainingCase) {
     let dst = 0;
 
+    if(testCase.length < trainingCase.length) {
+        for(let i = testCase.length - 1; i < trainingCase.length - 1; i++)
+            testCase.splice(i, 0, 0);
+    }
+
     testCase.forEach((value, index) => {
         if(index >= testCase.length - 2) return;
         dst += Math.pow(value - trainingCase[index] , 2);
