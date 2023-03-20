@@ -33,4 +33,8 @@ class FileContentLoader {
             })
         });
     }
+
+    addAttribute(attr) {
+        this.attributes.push(attr);
+    }
 }

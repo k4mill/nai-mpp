@@ -18,15 +18,18 @@ function findMode(array) {
     countMap = new Map();
 
     for(const value of array) {
-        if(!countMap.has(value)) countMap.set(value, 0);
+        if(!countMap.has(value)) countMap.set(value, 1);
         else countMap.set(value, countMap.get(value) + 1);
     }
 
-    if(countMap.size < 2) return Array.from(countMap.keys())[0];
+    const keysArray = Array.from(countMap.keys());
 
-    let maxCount = 0;
+    if(countMap.size < 2) return keysArray[0];
+
+    let maxCount = countMap.get(keysArray[0]);
+    let maxCountKey = keysArray[0];
     countMap.forEach((value, key) => {
-        if(value >= maxCount) {
+        if(value > maxCount) {
             maxCount = value;
             maxCountKey = key;
         } 
@@ -35,11 +38,13 @@ function findMode(array) {
     return maxCountKey;
 }
 
-function calculateDistances(trainingFcl, testFcl, k) {
+function calculateDistances(trainingFcl, testFcl, k) {    
     guessResults = [];
     correctGuessNumber = 0;
     if(!trainingFcl || !testFcl) return;
     if(trainingFcl?.attributes.length < 1 || testFcl?.attributes.length < 1) return;
+
+    document.querySelector('#custom-vector-wrapper').style.display = 'block';
 
     for(const testCase of testFcl.attributes) {
         if(testCase.length < 2) continue; // at least 1 attribute + 1 decisive attribute
@@ -52,21 +57,25 @@ function calculateDistances(trainingFcl, testFcl, k) {
         const unsortedDistances = distances.slice();
         distances.sort();
         const resultArray = [];
+        const usedIndexes = [];
 
         for(let i = 0; i < k; i++) {
-            const index = unsortedDistances.indexOf(distances[i]);
+            let index = unsortedDistances.indexOf(distances[i]);
+            if(usedIndexes.includes(index)) index = unsortedDistances.indexOf(distances[i], index + 1);
+            usedIndexes.push(index);
             resultArray.push(trainingFcl.attributes[index][trainingFcl.attributes[index].length - 1]);
         }
 
-        if(findMode(resultArray) === testCase[testCase.length - 1]) correctGuessNumber++;
-        guessResults.push(findMode(resultArray));
+        const mode = findMode(resultArray);
+
+        if(mode === testCase[testCase.length - 1]) correctGuessNumber++;
+        guessResults.push(mode);
     }
 
     displayResults();
 }
 
 function displayResults() {
-    console.log(guessResults)
     const resultsContainer = document.querySelector(".results-wrapper");
     const table = resultsContainer.querySelector("table");
     table.innerHTML = "<thead></thead><tbody></tbody>";
@@ -101,6 +110,7 @@ function displayResults() {
                 td.innerHTML = guessResults[i];
                 td.style.flex = "2";
                 if(td.innerHTML === testFcl.attributes[i][j]) td.style.color = "#78e08f";
+                else if(testFcl.attributes[i][j] === '?') td.style.color = "#f6e58d";
                 else {
                     td.style.color = "#e55039";
                     td.innerHTML += ` (correct: ${testFcl.attributes[i][j]})`;
@@ -111,7 +121,7 @@ function displayResults() {
         tr.classList.add("d-flex", "justify-content-center");
         tbody.appendChild(tr);
     }
-    document.querySelector(".accuracy").innerHTML = `<b>Accuracy: ${Math.round((correctGuessNumber / testCaseNumber) * 1000) / 10}%</b>`
+    document.querySelector(".accuracy").innerHTML = `<b>Accuracy: ${Math.round((correctGuessNumber / testCaseNumber) * 1000) / 10}% (${correctGuessNumber}/${testCaseNumber})</b>`
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -135,6 +145,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const kInput = document.querySelector("#k-input");
     kInput.addEventListener('input', (e) => {
         k = e.target.value;
+        calculateDistances(trainingFcl, testFcl, k);
+    })
+
+    const customVectorButton = document.querySelector("#custom-vector-button");
+    customVectorButton.addEventListener('click', () => {
+        if(!testFcl || !trainingFcl) return;
+
+        const input = document.querySelector("#custom-vector");
+        console.log(...input.value.split(';'))
+        testFcl.addAttribute([...input.value.split(';'), '?']);
         calculateDistances(trainingFcl, testFcl, k);
     })
 })
