@@ -1,0 +1,23 @@
+<div
+    class="form-wrapper my-2 d-flex justify-content-center align-items-center flex-column"
+    *ngIf="this.fileService.getTrainingData().length > 0">
+    <form [formGroup]="form">
+        <mat-form-field>
+            <mat-label>Parametr k</mat-label>
+            <input
+                matInput
+                type="text"
+                formControlName="kParam"
+                (input)="updateKParam()">
+        </mat-form-field>
+    </form>
+
+
+    <button
+        mat-raised-button
+        color="primary"
+        (click)="this.kMeansService.initGroups()"
+        [disabled]="!this.form.valid">
+        Oblicz
+    </button>
+</div>

@@ -1,0 +1,16 @@
+<div class="file-input-wrapper">
+    <button
+        type="button"
+        mat-raised-button
+        color="primary"
+        (click)="fileInput.click()">
+        Wybierz plik z danymi treningowymi
+        <mat-icon fontIcon="attach_file"></mat-icon>
+    </button>
+    <input hidden (change)="onFileInputChange($event)" #fileInput type="file">
+    
+    <p
+        *ngIf="this.fileService.getFileName()"
+        style="color: #69f0ae;"
+        class="mt-2 text-center">Wczytano plik {{ this.fileService.getFileName() }}</p>
+</div>
